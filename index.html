@@ -182,6 +182,80 @@
     .draw-config { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; width: 100%; }
     .card-deck { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
 
+    /* ── 78-card deck picker ── */
+    .deck-phase { width: 100%; }
+    .deck-pick-hint {
+      font-size: .82rem; color: #9b8ab0; margin-bottom: 10px; text-align: center;
+    }
+    .deck-pick-hint span { color: #d4b8f0; font-weight: bold; }
+    .deck-scroll-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: #3d2a60 transparent;
+      padding: 8px 0 14px;
+    }
+    .deck-scroll-wrap::-webkit-scrollbar { height: 4px; }
+    .deck-scroll-wrap::-webkit-scrollbar-track { background: transparent; }
+    .deck-scroll-wrap::-webkit-scrollbar-thumb { background: #3d2a60; border-radius: 4px; }
+    .deck-row {
+      display: flex;
+      gap: 5px;
+      padding: 4px 8px;
+      width: max-content;
+    }
+    .deck-card {
+      width: 58px;
+      height: 92px;
+      background: linear-gradient(145deg, #2e1f50, #110b24);
+      border: 2px solid #3d2a60;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      flex-shrink: 0;
+      user-select: none;
+      transition: transform .18s, border-color .18s, box-shadow .18s, opacity .2s;
+      position: relative;
+    }
+    .deck-card:hover {
+      transform: translateY(-10px) scale(1.04);
+      border-color: #7c3aed;
+      box-shadow: 0 8px 20px rgba(109,40,217,.45);
+    }
+    .deck-card.selected {
+      transform: translateY(-14px);
+      border-color: #d4b8f0;
+      box-shadow: 0 10px 28px rgba(212,184,240,.55);
+      background: linear-gradient(145deg, #4c1d95, #1a1040);
+    }
+    .deck-card.selected::after {
+      content: attr(data-order);
+      position: absolute;
+      top: -8px; right: -6px;
+      background: #7c3aed;
+      color: #fff;
+      font-size: .6rem;
+      font-family: sans-serif;
+      border-radius: 50%;
+      width: 16px; height: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold;
+      line-height: 16px;
+      text-align: center;
+    }
+    .deck-card.used {
+      opacity: .22;
+      pointer-events: none;
+      transform: none !important;
+    }
+    .deck-card-sym  { font-size: 1.5rem; opacity: .5; }
+    .deck-card-lbl  { font-size: .5rem; letter-spacing: .12em; color: #4c1d95; }
+
     /* ── Card flip ── */
     .card-slot {
       display: flex;
@@ -392,6 +466,7 @@
             <select id="tarot-spread">
               <option value="1">1장 (원카드)</option>
               <option value="3" selected>3장 (과거·현재·미래)</option>
+              <option value="5">5장 (과거·현재·장애·조언·결과)</option>
             </select>
           </div>
           <div class="field-group" style="justify-content:flex-end">
@@ -399,6 +474,15 @@
           </div>
         </div>
 
+        <!-- 78장 덱 선택 단계 -->
+        <div class="deck-phase" id="deck-phase" style="display:none">
+          <p class="deck-pick-hint" id="deck-hint"></p>
+          <div class="deck-scroll-wrap">
+            <div class="deck-row" id="deck-row"></div>
+          </div>
+        </div>
+
+        <!-- 선택된 카드 뒤집기 단계 -->
         <div id="tarot-deck" class="card-deck"></div>
         <p class="flip-hint" id="flip-hint" style="display:none"></p>
         <div class="interp-box" id="tarot-interp" style="display:none;width:100%"></div>
@@ -671,30 +755,95 @@ function getCardMeaning(card, isReversed) {
 }
 
 // ════════════════════════════════════════════════
-//  타로 UI — 카드 뒤집기
+//  타로 UI — 78장 덱 선택 → 뒤집기
 // ════════════════════════════════════════════════
 
-let drawnCards    = [];
-let _flippedCount = 0;
+let drawnCards     = [];
+let _flippedCount  = 0;
+let _spreadN       = 1;
+let _shuffledDeck  = [];
+let _selectedIdx   = [];   // 덱에서 선택된 인덱스들
 
-const SPREAD_LABELS = ['과거','현재','미래'];
+const SPREAD_LABELS = {
+  1: [],
+  3: ['과거','현재','미래'],
+  5: ['과거','현재','장애물','조언','결과'],
+};
 
 function drawTarot() {
-  const spreadN  = parseInt(document.getElementById('tarot-spread').value);
-  const shuffled = [...FULL_DECK].sort(() => Math.random() - 0.5);
-  drawnCards = shuffled.slice(0, spreadN).map(c => ({ ...c, reversed: Math.random() < 0.3 }));
+  _spreadN = parseInt(document.getElementById('tarot-spread').value);
+  _selectedIdx = [];
+  _shuffledDeck = [...FULL_DECK].sort(() => Math.random() - 0.5);
+
+  // 초기화
+  document.getElementById('tarot-deck').innerHTML = '';
+  document.getElementById('tarot-interp').style.display = 'none';
+  document.getElementById('flip-hint').style.display    = 'none';
+
+  // 78장 덱 표시
+  const phase = document.getElementById('deck-phase');
+  phase.style.display = '';
+  _updateDeckHint();
+
+  document.getElementById('deck-row').innerHTML = _shuffledDeck.map((_, i) => `
+    <div class="deck-card" id="dc-${i}" onclick="selectDeckCard(${i})">
+      <div class="deck-card-sym">✦</div>
+      <div class="deck-card-lbl">TAROT</div>
+    </div>
+  `).join('');
+
+  // 스크롤 가운데 정렬 (살짝 뒤 처리)
+  setTimeout(() => {
+    const wrap = document.querySelector('.deck-scroll-wrap');
+    if (wrap) wrap.scrollLeft = 0;
+  }, 50);
+}
+
+function _updateDeckHint() {
+  const remaining = _spreadN - _selectedIdx.length;
+  const hint = document.getElementById('deck-hint');
+  if (remaining > 0) {
+    hint.innerHTML = `마음이 끌리는 카드를 <span>${remaining}장</span> 더 선택하세요`;
+  } else {
+    hint.innerHTML = `<span>${_spreadN}장</span> 선택 완료! 카드를 뒤집어봅니다…`;
+  }
+}
+
+function selectDeckCard(i) {
+  if (_selectedIdx.includes(i)) return;                   // 이미 선택됨
+  if (_selectedIdx.length >= _spreadN) return;            // 이미 다 선택됨
+
+  _selectedIdx.push(i);
+  const el = document.getElementById('dc-' + i);
+  el.classList.add('selected');
+  el.setAttribute('data-order', _selectedIdx.length);     // 순서 배지
+
+  _updateDeckHint();
+
+  if (_selectedIdx.length === _spreadN) {
+    // 잠깐 보여준 후 뒤집기 단계로 전환
+    setTimeout(() => _startFlipPhase(), 750);
+  }
+}
+
+function _startFlipPhase() {
+  // 덱 숨기기
+  document.getElementById('deck-phase').style.display = 'none';
+
+  // 선택된 카드들로 drawnCards 구성
+  drawnCards = _selectedIdx.map(di => ({
+    ..._shuffledDeck[di],
+    reversed: Math.random() < 0.3,
+  }));
   _flippedCount = 0;
 
-  document.getElementById('tarot-interp').style.display = 'none';
-  document.getElementById('tarot-interp').textContent   = '';
-
-  // Face-down cards
   const hint = document.getElementById('flip-hint');
-  hint.textContent = spreadN === 1
+  hint.textContent = _spreadN === 1
     ? '카드를 클릭해서 뒤집어보세요'
-    : `카드를 한 장씩 클릭해서 뒤집어보세요 (${spreadN}장)`;
+    : `카드를 한 장씩 클릭해서 뒤집어보세요`;
   hint.style.display = '';
 
+  const labels = SPREAD_LABELS[_spreadN] || [];
   document.getElementById('tarot-deck').innerHTML = drawnCards.map((card, i) => `
     <div class="card-slot" id="slot-${i}" onclick="flipCard(${i})">
       <div class="card-flip-wrap">
@@ -711,7 +860,7 @@ function drawTarot() {
           </div>
         </div>
       </div>
-      ${spreadN === 3 ? `<div class="spread-label">${SPREAD_LABELS[i]}</div>` : ''}
+      ${labels[i] ? `<div class="spread-label">${labels[i]}</div>` : ''}
     </div>
   `).join('');
 }
@@ -722,24 +871,23 @@ function flipCard(idx) {
   if (!flip || flip.classList.contains('flipped')) return;
 
   flip.classList.add('flipped');
-  slot.classList.add('done'); // stops hover glow
+  slot.classList.add('done');
   slot.style.cursor = 'default';
   _flippedCount++;
 
-  const hint = document.getElementById('flip-hint');
-  const remaining = drawnCards.length - _flippedCount;
-  if (remaining > 0) {
-    hint.textContent = `${remaining}장 남았습니다. 계속 클릭해서 뒤집어보세요`;
+  const hint   = document.getElementById('flip-hint');
+  const remain = drawnCards.length - _flippedCount;
+  if (remain > 0) {
+    hint.textContent = `${remain}장 남았습니다`;
   } else {
     hint.style.display = 'none';
-    // 모든 카드 뒤집힘 → 해석 표시
     setTimeout(() => showTarotInterp(), 700);
   }
 }
 
 function showTarotInterp() {
-  const cat   = document.getElementById('tarot-cat').value;
-  const box   = document.getElementById('tarot-interp');
+  const cat = document.getElementById('tarot-cat').value;
+  const box = document.getElementById('tarot-interp');
   box.style.display = 'none';
   void box.offsetWidth;
   box.textContent   = generateTarotText(drawnCards, cat);
@@ -910,14 +1058,18 @@ const 카테고리컨텍스트 = {
   대인관계:'대인관계',     가족운:'가족',             이사여행:'이동과 여행',
 };
 const 포지션멘트 = {
-  과거: ['지나온 흐름은','과거의 에너지는','걸어온 길을 돌아보면'],
-  현재: ['지금 이 순간은','현재의 에너지는','지금 당신에게는'],
-  미래: ['앞으로의 흐름은','다가올 에너지는','미래를 바라보면'],
+  과거:   ['지나온 흐름은','과거의 에너지는','걸어온 길을 돌아보면'],
+  현재:   ['지금 이 순간은','현재의 에너지는','지금 당신에게는'],
+  미래:   ['앞으로의 흐름은','다가올 에너지는','미래를 바라보면'],
+  장애물: ['지금 가로막고 있는 것은','현재의 도전 과제는','넘어야 할 것을 보면'],
+  조언:   ['카드가 건네는 조언은','이 상황에서 필요한 것은','카드의 안내에 따르면'],
+  결과:   ['이 흐름이 이어진다면','흐름의 종착점을 보면','에너지가 수렴하는 곳은'],
 };
 
 function generateTarotText(cards, cat) {
   const ctx = 카테고리컨텍스트[cat] || cat;
   const lines = [`${ctx} 방면에서 카드가 이야기합니다.\n`];
+  const posLabels = SPREAD_LABELS[cards.length] || [];
 
   if (cards.length === 1) {
     const c = cards[0];
@@ -927,14 +1079,16 @@ function generateTarotText(cards, cat) {
                    '이 흐름 속에서 자신만의 길을 찾아가시기 바랍니다.']));
   } else {
     cards.forEach((c, i) => {
-      const pos = SPREAD_LABELS[i];
-      lines.push(`[${pos}] ${c.name}${c.reversed ? ' (역방향)' : ''}\n${_r(포지션멘트[pos])} ${getCardMeaning(c, c.reversed)}`);
+      const pos = posLabels[i];
+      const posText = pos && 포지션멘트[pos] ? `${_r(포지션멘트[pos])} ` : '';
+      const label   = pos ? `[${pos}] ` : '';
+      lines.push(`${label}${c.name}${c.reversed ? ' (역방향)' : ''}\n${posText}${getCardMeaning(c, c.reversed)}`);
     });
-    const pos = cards.some(c => !c.reversed && ['태양','별','세계','연인','전차'].includes(c.name));
-    const neg = cards.some(c => c.reversed || ['탑','악마','달'].includes(c.name));
-    lines.push(pos && !neg
-      ? '세 장의 카드가 모두 긍정적인 흐름을 가리키고 있습니다. 자신감을 갖고 앞으로 나아가세요.'
-      : neg
+    const hasPos = cards.some(c => !c.reversed && ['태양','별','세계','연인','전차'].includes(c.name));
+    const hasNeg = cards.some(c => c.reversed || ['탑','악마','달'].includes(c.name));
+    lines.push(hasPos && !hasNeg
+      ? `${cards.length}장의 카드가 긍정적인 흐름을 가리키고 있습니다. 자신감을 갖고 앞으로 나아가세요.`
+      : hasNeg
       ? '도전의 기운이 보이지만, 이 과정은 당신을 더 단단하게 만드는 성장의 발판이 될 것입니다.'
       : '균형 잡힌 에너지 속에서 꾸준한 노력과 균형 감각이 좋은 결과를 가져올 것입니다.');
   }
