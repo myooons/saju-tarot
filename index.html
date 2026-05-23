@@ -12,7 +12,6 @@
       font-family: 'Noto Serif KR', 'Noto Serif', Georgia, serif;
       min-height: 100vh;
     }
-    a { color: inherit; }
 
     /* ── Layout ── */
     .container { max-width: 780px; margin: 0 auto; padding: 32px 20px 80px; }
@@ -67,7 +66,6 @@
       gap: 10px;
       align-items: end;
     }
-    .birth-grid-full { grid-template-columns: 2fr 1fr 1fr 1.5fr auto; }
     .field-group { display: flex; flex-direction: column; gap: 4px; }
     label { font-size: .78rem; color: #9b8ab0; }
     select {
@@ -105,9 +103,6 @@
       white-space: nowrap;
     }
     .btn:hover { background: #7c3aed; }
-    .btn-sm { font-size: .8rem; padding: 7px 16px; }
-    .btn-ai { background: #4c1d95; }
-    .btn-ai:hover { background: #5b21b6; }
     .btn-full { width: 100%; margin-top: 16px; }
 
     /* ── Pillars ── */
@@ -161,17 +156,19 @@
       color: #e2d9f3;
     }
 
-    /* ── Fortune text ── */
-    .fortune-box {
+    /* ── Interpretation box ── */
+    .interp-box {
       background: #110b24;
-      border-left: 3px solid #6d28d9;
+      border-left: 3px solid #8b5cf6;
       border-radius: 0 8px 8px 0;
       padding: 16px 20px;
-      line-height: 1.8;
+      line-height: 1.85;
       font-size: .9rem;
       color: #cbbfe0;
       white-space: pre-line;
+      animation: fadeIn .4s ease;
     }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
 
     /* ── Ohaeng colors ── */
     .oh-목 { color: #4ade80; }
@@ -179,88 +176,93 @@
     .oh-토 { color: #fbbf24; }
     .oh-금 { color: #e5e7eb; }
     .oh-수 { color: #60a5fa; }
-    .gan-갑,.gan-을 { color: #4ade80; }
-    .gan-병,.gan-정 { color: #f87171; }
-    .gan-무,.gan-기 { color: #fbbf24; }
-    .gan-경,.gan-신 { color: #e5e7eb; }
-    .gan-임,.gan-계 { color: #60a5fa; }
-    .ji-자,.ji-해 { color: #60a5fa; }
-    .ji-인,.ji-묘 { color: #4ade80; }
-    .ji-사,.ji-오 { color: #f87171; }
-    .ji-진,.ji-술,.ji-축,.ji-미 { color: #fbbf24; }
-    .ji-신,.ji-유 { color: #e5e7eb; }
 
-    /* ── AI section ── */
-    .ai-section { margin-top: 16px; }
-    .ai-btn-row { display: flex; gap: 8px; align-items: center; margin-bottom: 4px; }
-    .ai-progress { width: 100%; background: #0a0718; border-radius: 8px; height: 6px; margin: 10px 0; }
-    .ai-progress-bar { height: 6px; background: linear-gradient(90deg, #6d28d9, #c084fc); border-radius: 8px; transition: width .3s; }
-    .ai-output {
-      background: #110b24;
-      border-left: 3px solid #c084fc;
-      border-radius: 0 8px 8px 0;
-      padding: 14px 18px;
-      font-size: .88rem;
-      color: #e0d4f8;
-      line-height: 1.8;
-      margin-top: 12px;
-      white-space: pre-wrap;
-      font-family: inherit;
-    }
-    .ai-note { font-size: .72rem; color: #5c4f6e; margin-top: 6px; }
-    .ai-status { font-size: .75rem; color: #9b8ab0; }
+    /* ── Tarot area ── */
+    .tarot-area { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+    .draw-config { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; width: 100%; }
+    .card-deck { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
 
-    /* ── Tarot ── */
-    .tarot-area { display: flex; flex-direction: column; align-items: center; gap: 20px; }
-    .cat-select-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; width: 100%; }
-    .card-deck {
+    /* ── Card flip ── */
+    .card-slot {
       display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
     }
-    .tarot-card {
-      width: 100px; height: 160px;
-      background: linear-gradient(135deg, #2e1f50, #1a1030);
-      border: 2px solid #4c1d95;
-      border-radius: 10px;
+    .card-flip-wrap {
+      perspective: 900px;
+      width: 100px;
+      height: 160px;
+    }
+    .card-flip {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform .65s cubic-bezier(.4,0,.2,1);
       cursor: pointer;
+    }
+    .card-flip.flipped {
+      transform: rotateY(180deg);
+      cursor: default;
+    }
+    .card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 10px;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 2.5rem;
-      transition: transform .2s, border-color .2s;
-      position: relative;
-      overflow: hidden;
     }
-    .tarot-card:hover { transform: translateY(-6px); border-color: #8b5cf6; }
-    .tarot-card.revealed {
+    /* Back face */
+    .card-face-back {
+      background: linear-gradient(135deg, #2e1f50, #110b24);
+      border: 2px solid #4c1d95;
+      gap: 6px;
+      transition: border-color .25s, box-shadow .25s;
+    }
+    .card-slot:not(.done):hover .card-face-back {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 20px rgba(139,92,246,.45);
+    }
+    .back-symbol {
+      font-size: 2.2rem;
+      opacity: .55;
+      user-select: none;
+    }
+    .back-label {
+      font-size: .6rem;
+      letter-spacing: .18em;
+      color: #4c1d95;
+      user-select: none;
+    }
+    /* Front face */
+    .card-face-front {
+      transform: rotateY(180deg);
       background: linear-gradient(135deg, #1e1040, #0f0a1e);
-      border-color: #d4b8f0;
-      cursor: default;
-      flex-direction: column;
+      border: 2px solid #d4b8f0;
       gap: 4px;
+      padding: 8px;
     }
-    .tarot-card.revealed:hover { transform: none; }
-    .tarot-card.reversed { transform: rotate(180deg); }
-    .tarot-card.reversed:hover { transform: rotate(180deg) translateY(-6px); }
+    /* Reversed: additionally rotate the front content */
+    .card-flip.is-reversed .card-face-front {
+      transform: rotateY(180deg) rotate(180deg);
+    }
     .card-name { font-size: .65rem; text-align: center; color: #c4a0e8; padding: 0 4px; word-break: keep-all; }
     .card-num  { font-size: .55rem; color: #7c6a9a; }
-    .spread-label { font-size: .7rem; color: #7c6a9a; text-align: center; margin-top: 4px; }
-    .tarot-result { width: 100%; display: flex; flex-direction: column; gap: 14px; }
-    .tarot-interp {
-      background: #110b24;
-      border-left: 3px solid #8b5cf6;
-      border-radius: 0 8px 8px 0;
-      padding: 14px 18px;
-    }
-    .tarot-interp h4 { font-size: .85rem; color: #d4b8f0; margin-bottom: 8px; }
-    .tarot-interp p  { font-size: .85rem; color: #cbbfe0; line-height: 1.7; }
-    .draw-config { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; width: 100%; }
+    .card-rev  { font-size: .6rem; color: #9b8ab0; margin-top: 2px; }
+    .spread-label { font-size: .72rem; color: #7c6a9a; }
+    .flip-hint { font-size: .7rem; color: #5c4f6e; text-align: center; }
 
-    /* ── Misc ── */
-    .hint { font-size: .75rem; color: #5c4f6e; margin-top: 10px; }
-    .empty { text-align: center; color: #5c4f6e; padding: 40px 0; font-size: .9rem; }
+    /* Pulse on unflipped cards */
+    @keyframes cardPulse {
+      0%,100% { box-shadow: 0 0 6px rgba(109,40,217,.2); }
+      50%      { box-shadow: 0 0 20px rgba(109,40,217,.55); }
+    }
+    .card-flip:not(.flipped) .card-face-back { animation: cardPulse 2.2s ease-in-out infinite; }
 
     /* ── PDF FAB ── */
     .pdf-fab {
@@ -272,13 +274,16 @@
     }
     .pdf-fab:hover { background: #7c3aed; }
 
+    /* ── Misc ── */
+    .hint { font-size: .75rem; color: #5c4f6e; margin-top: 10px; }
+
     /* ── Responsive ── */
     @media (max-width: 560px) {
       .birth-grid { grid-template-columns: 1fr 1fr; }
       .pillars { grid-template-columns: repeat(2, 1fr); }
       .pillar-gan { font-size: 1.5rem; }
       .pillar-ji  { font-size: 1.2rem; }
-      .btn-full-mobile { width: 100%; margin-top: 8px; }
+      .card-flip-wrap { width: 88px; height: 142px; }
     }
 
     /* ── Print ── */
@@ -288,9 +293,7 @@
       header h1 { color: #333 !important; }
       header p  { color: #666 !important; }
       .page-tabs, .birth-grid, .tabs, .draw-config,
-      .btn, .pdf-fab, .ai-section > .ai-btn-row,
-      #ai-saju-progress-wrap, #ai-tarot-progress-wrap,
-      .hint, .ai-note { display: none !important; }
+      .btn, .pdf-fab, .flip-hint, .hint { display: none !important; }
       #tab-saju, #tab-tarot { display: block !important; }
       .card { background: #fff !important; border: 1px solid #ccc !important; break-inside: avoid; }
       .card h2 { color: #333 !important; }
@@ -298,11 +301,7 @@
       .pillar-label, .pillar-sub { color: #666 !important; }
       .oh-item  { background: #f9f9f9 !important; }
       .oh-count { color: #666 !important; }
-      .fortune-box { background: #f9f9f9 !important; border-left: 3px solid #7c3aed; color: #222 !important; }
-      .tarot-interp { background: #f9f9f9 !important; border-left: 3px solid #7c3aed; }
-      .tarot-interp h4 { color: #333 !important; }
-      .tarot-interp p  { color: #444 !important; }
-      .ai-output { background: #f5f0ff !important; border-left: 3px solid #7c3aed; color: #222 !important; }
+      .interp-box { background: #f9f9f9 !important; border-left: 3px solid #7c3aed; color: #222 !important; }
     }
   </style>
 </head>
@@ -319,15 +318,11 @@
     <button class="page-tab" onclick="showTab('tarot')">🃏 타로</button>
   </div>
 
-  <!-- ══════════════════════════════
-       사주 탭
-  ══════════════════════════════ -->
+  <!-- ══════════════════════════════ 사주 탭 ══════════════════════════════ -->
   <div id="tab-saju">
-
-    <!-- 생년월일 입력 -->
     <div class="card">
       <h2>🌙 생년월일 입력</h2>
-      <div class="birth-grid" id="birth-grid">
+      <div class="birth-grid">
         <div class="field-group">
           <label>년도</label>
           <select id="sel-year"></select>
@@ -363,31 +358,16 @@
       <p class="hint">입력 정보는 이 기기에만 저장되며 서버로 전송되지 않습니다.</p>
     </div>
 
-    <!-- 사주팔자 결과 -->
     <div id="saju-section" class="card" style="display:none">
       <h2>☯ 사주팔자</h2>
       <div class="pillars" id="pillars"></div>
       <div class="ohaeng" id="ohaeng"></div>
       <div class="tabs" id="fortune-tabs"></div>
-      <div class="fortune-box" id="fortune-text"></div>
-      <div class="ai-section" id="ai-saju-section" style="display:none">
-        <div class="ai-btn-row">
-          <button class="btn btn-sm btn-ai" onclick="generateSajuAI()">✨ AI 해석 생성</button>
-          <span class="ai-status" id="ai-saju-status"></span>
-        </div>
-        <div id="ai-saju-progress-wrap" style="display:none">
-          <div class="ai-progress"><div class="ai-progress-bar" id="ai-saju-bar" style="width:0%"></div></div>
-        </div>
-        <div id="ai-saju-output" class="ai-output" style="display:none"></div>
-        <p class="ai-note">* 오행·일간·카테고리 기반 맞춤 해석을 생성합니다.</p>
-      </div>
+      <div class="interp-box" id="saju-interp" style="display:none"></div>
     </div>
+  </div>
 
-  </div><!-- /tab-saju -->
-
-  <!-- ══════════════════════════════
-       타로 탭
-  ══════════════════════════════ -->
+  <!-- ══════════════════════════════ 타로 탭 ══════════════════════════════ -->
   <div id="tab-tarot" style="display:none">
     <div class="card">
       <h2>🃏 타로 카드</h2>
@@ -418,26 +398,17 @@
             <button class="btn" onclick="drawTarot()">카드 뽑기</button>
           </div>
         </div>
+
         <div id="tarot-deck" class="card-deck"></div>
-        <div id="tarot-result" class="tarot-result"></div>
-        <div class="ai-section" style="width:100%">
-          <div class="ai-btn-row" id="ai-tarot-btn-row" style="display:none">
-            <button class="btn btn-sm btn-ai" onclick="generateTarotAI()">✨ AI 해석 생성</button>
-            <span class="ai-status" id="ai-tarot-status"></span>
-          </div>
-          <div id="ai-tarot-progress-wrap" style="display:none">
-            <div class="ai-progress"><div class="ai-progress-bar" id="ai-tarot-bar" style="width:0%"></div></div>
-          </div>
-          <div id="ai-tarot-output" class="ai-output" style="display:none"></div>
-          <p class="ai-note" id="ai-tarot-note" style="display:none">* GPT-2 모델이 방문자 기기에서 직접 실행됩니다 (첫 로드 약 450MB). 번역 포함.</p>
-        </div>
+        <p class="flip-hint" id="flip-hint" style="display:none"></p>
+        <div class="interp-box" id="tarot-interp" style="display:none;width:100%"></div>
       </div>
     </div>
-  </div><!-- /tab-tarot -->
+  </div>
 
-</div><!-- /container -->
+</div>
 
-<button class="pdf-fab" onclick="exportPDF()">📄 PDF 저장</button>
+<button class="pdf-fab" onclick="window.print()">📄 PDF 저장</button>
 
 <script>
 // ════════════════════════════════════════════════
@@ -445,9 +416,9 @@
 // ════════════════════════════════════════════════
 
 function showTab(name) {
-  ['saju','tarot'].forEach(t => {
+  ['saju','tarot'].forEach((t, i) => {
     document.getElementById('tab-' + t).style.display = t === name ? '' : 'none';
-    document.querySelector(`.page-tab:nth-child(${t === 'saju' ? 1 : 2})`).classList.toggle('active', t === name);
+    document.querySelectorAll('.page-tab')[i].classList.toggle('active', t === name);
   });
 }
 
@@ -458,13 +429,9 @@ function showTab(name) {
 (function initSelects() {
   const ySel = document.getElementById('sel-year');
   const mSel = document.getElementById('sel-month');
-  const now = new Date();
-  for (let y = now.getFullYear(); y >= 1920; y--) {
-    ySel.add(new Option(y + '년', y));
-  }
-  for (let m = 1; m <= 12; m++) {
-    mSel.add(new Option(m + '월', m));
-  }
+  const now  = new Date();
+  for (let y = now.getFullYear(); y >= 1920; y--) ySel.add(new Option(y + '년', y));
+  for (let m = 1; m <= 12; m++) mSel.add(new Option(m + '월', m));
   mSel.value = now.getMonth() + 1;
   updateDays();
   ySel.addEventListener('change', updateDays);
@@ -472,15 +439,13 @@ function showTab(name) {
 })();
 
 function updateDays() {
-  const y = +document.getElementById('sel-year').value;
-  const m = +document.getElementById('sel-month').value;
+  const y    = +document.getElementById('sel-year').value;
+  const m    = +document.getElementById('sel-month').value;
   const dSel = document.getElementById('sel-day');
   const prev = dSel.value;
-  const max = new Date(y, m, 0).getDate();
+  const max  = new Date(y, m, 0).getDate();
   dSel.innerHTML = '';
-  for (let d = 1; d <= max; d++) {
-    dSel.add(new Option(d + '일', d));
-  }
+  for (let d = 1; d <= max; d++) dSel.add(new Option(d + '일', d));
   dSel.value = Math.min(prev || 1, max);
 }
 
@@ -493,13 +458,11 @@ const 지지 = ['자','축','인','묘','진','사','오','미','신','유','술
 const 천간오행 = { 갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수' };
 const 지지오행 = { 자:'수',축:'토',인:'목',묘:'목',진:'토',사:'화',오:'화',미:'토',신:'금',유:'금',술:'토',해:'수' };
 const 지지동물 = { 자:'쥐',축:'소',인:'호랑이',묘:'토끼',진:'용',사:'뱀',오:'말',미:'양',신:'원숭이',유:'닭',술:'개',해:'돼지' };
-const 오행색 = { 목:'#4ade80',화:'#f87171',토:'#fbbf24',금:'#e5e7eb',수:'#60a5fa' };
-
-const 절기일 = [0, 6, 4, 6, 5, 6, 6, 7, 8, 8, 8, 7, 7];
+const 오행색   = { 목:'#4ade80',화:'#f87171',토:'#fbbf24',금:'#e5e7eb',수:'#60a5fa' };
 
 function getYearPillar(year, month, day) {
   let y = year;
-  if (month < 2 || (month === 2 && day < 4)) y -= 1;
+  if (month < 2 || (month === 2 && day < 4)) y--;
   const ganIdx = ((y - 4) % 10 + 10) % 10;
   const jiIdx  = ((y - 4) % 12 + 12) % 12;
   return { gan: 천간[ganIdx], ji: 지지[jiIdx] };
@@ -508,19 +471,17 @@ function getYearPillar(year, month, day) {
 function getMonthPillar(year, month, day, yearGan) {
   const 절기시작 = [0, 4, 19, 6, 20, 6, 21, 7, 23, 8, 23, 7, 22];
   let m = month;
-  if (day < 절기시작[month]) m -= 1;
+  if (day < 절기시작[month]) m--;
   if (m <= 0) m += 12;
-  const 년간idx = 천간.indexOf(yearGan);
+  const 년간idx  = 천간.indexOf(yearGan);
   const 기준월간 = [2, 4, 6, 8, 0, 2, 4, 6, 8, 0];
-  const ganIdx = (기준월간[년간idx] + (m - 1)) % 10;
-  const jiIdx  = ((m + 1) % 12);
+  const ganIdx   = (기준월간[년간idx] + (m - 1)) % 10;
+  const jiIdx    = (m + 1) % 12;
   return { gan: 천간[ganIdx], ji: 지지[jiIdx] };
 }
 
 function getDayPillar(year, month, day) {
-  const base   = new Date(1900, 0, 1);
-  const target = new Date(year, month - 1, day);
-  const diff   = Math.round((target - base) / 86400000);
+  const diff   = Math.round((new Date(year, month - 1, day) - new Date(1900, 0, 1)) / 86400000);
   const ganIdx = ((diff % 10) + 10) % 10;
   const jiIdx  = ((diff % 12) + 12) % 12;
   return { gan: 천간[ganIdx], ji: 지지[jiIdx] };
@@ -528,9 +489,9 @@ function getDayPillar(year, month, day) {
 
 function getHourPillar(hour, dayGan) {
   const jiIdx   = hour === 23 ? 0 : Math.floor((hour + 1) / 2) % 12;
-  const 일간idx = 천간.indexOf(dayGan);
+  const 일간idx  = 천간.indexOf(dayGan);
   const 기준시간 = [0, 2, 4, 6, 8, 0, 2, 4, 6, 8];
-  const ganIdx  = (기준시간[일간idx] + jiIdx) % 10;
+  const ganIdx   = (기준시간[일간idx] + jiIdx) % 10;
   return { gan: 천간[ganIdx], ji: 지지[jiIdx] };
 }
 
@@ -544,79 +505,11 @@ function calcOhaeng(pillars) {
 }
 
 // ════════════════════════════════════════════════
-//  사주 해석 데이터
+//  사주 UI
 // ════════════════════════════════════════════════
 
-const 천간성격 = {
-  갑:'정직하고 진취적이며 리더십이 강합니다. 새로운 것을 시작하는 데 탁월하지만 고집이 강할 수 있습니다.',
-  을:'유연하고 적응력이 뛰어나며 인간관계가 원만합니다. 예술적 감각이 풍부하나 우유부단할 수 있습니다.',
-  병:'열정적이고 활동적이며 사교성이 좋습니다. 밝고 따뜻한 성격이나 충동적인 면이 있습니다.',
-  정:'세심하고 지혜로우며 배려심이 깊습니다. 직관력이 뛰어나지만 걱정이 많을 수 있습니다.',
-  무:'신뢰롭고 책임감이 강하며 포용력이 넓습니다. 안정을 추구하나 변화에 다소 둔감할 수 있습니다.',
-  기:'실용적이고 성실하며 꾸준합니다. 현실 감각이 뛰어나지만 지나치게 조심스러울 수 있습니다.',
-  경:'결단력이 강하고 정의감이 넘칩니다. 원칙을 중시하며 추진력이 있지만 냉정해 보일 수 있습니다.',
-  신:'날카롭고 분석적이며 완벽을 추구합니다. 섬세하고 예리하지만 비판적이 될 수 있습니다.',
-  임:'지혜롭고 유연하며 포용력이 있습니다. 큰 그림을 보는 능력이 있지만 우유부단할 수 있습니다.',
-  계:'내면이 깊고 직관적이며 신중합니다. 감수성이 풍부하지만 소극적이 될 수 있습니다.',
-};
-
-const 오행운세 = {
-  목: {
-    연애운:'목(木) 기운이 강한 당신은 진취적인 사랑을 합니다. 먼저 다가가는 스타일로 이성에게 매력적으로 보입니다. 다만 자기주장이 강해 갈등이 생기면 한발 물러서는 연습이 필요합니다. 인내심 있는 파트너와 잘 맞습니다.',
-    금전운:'목(木) 기운은 시작과 성장을 상징합니다. 새로운 사업이나 투자의 씨앗을 뿌리기 좋은 기질입니다. 장기적인 안목으로 꾸준히 쌓아가는 방식이 재물 축적에 유리합니다. 단기 투기보다 장기 투자가 맞습니다.',
-    직업운:'목(木) 기운은 성장과 확장을 뜻합니다. 교육, 기획, 창업, 의료, 환경 분야가 적합합니다. 조직보다 자유로운 환경에서 능력을 발휘합니다. 리더 역할을 맡을 때 진가를 발휘합니다.',
-    건강운:'간·담·눈·근육·힘줄이 목(木) 기운과 연관됩니다. 봄철 환절기에 건강 관리가 필요합니다. 과로와 스트레스를 조심하고 규칙적인 스트레칭과 야외 활동을 권합니다.',
-    학업운:'목(木) 기운은 새로운 지식을 흡수하는 힘입니다. 창의적 사고와 분석력이 뛰어나 이공계·인문학 모두 잘 맞습니다. 초반 동기부여가 중요하며 한번 흥미를 붙이면 깊이 파고드는 스타일입니다.',
-    대인관계:'목(木) 기운은 곧고 정직한 인간관계를 만듭니다. 리더형이라 사람들이 따르지만 고집스러워 보일 수 있습니다. 겸손함을 갖추면 더 넓은 인맥을 구축할 수 있습니다.',
-    가족운:'가족 중 든든한 기둥 역할을 합니다. 가족에 대한 책임감이 강하며 특히 부모님께 효도하는 성격입니다. 가족과의 소통에서 지나치게 직선적이 되지 않도록 유의하세요.',
-    이사여행:'목(木) 기운은 동쪽과 북동쪽이 유리합니다. 자연이 많은 곳, 숲이나 공원 근처로의 이사가 기운을 돋웁니다. 봄에 이사하면 새로운 시작이 순조롭습니다.',
-    총운:'목(木) 기운이 강한 당신은 성장과 발전의 기질을 타고났습니다. 시작하는 힘이 강하고 추진력이 뛰어나 새로운 도전에서 빛을 발합니다. 올해는 씨앗을 뿌리는 해로, 장기적 목표를 세우고 꾸준히 노력하면 큰 결실을 맺을 수 있습니다.',
-  },
-  화: {
-    연애운:'화(火) 기운이 강한 당신은 열정적이고 매력적인 사랑을 합니다. 처음부터 강렬하게 타오르는 스타일로 상대에게 깊은 인상을 남깁니다. 감정 기복을 잘 조절하고 차분한 대화로 감정을 풀어가면 장기적인 관계가 더욱 빛납니다.',
-    금전운:'화(火) 기운은 빠른 순환과 역동성을 상징합니다. 투자 감각이 좋고 기회를 잘 잡지만 과감함이 때로는 손실로 이어질 수 있습니다. 충동적 지출을 자제하고 여유 자금 관리를 철저히 하면 풍요로운 재물운을 가져옵니다.',
-    직업운:'화(火) 기운은 창의성과 열정을 상징합니다. 예술, 방송, 마케팅, 요식업, IT 분야가 적합합니다. 무대 위에서 빛나는 타입으로, 사람들 앞에 서는 직업이 잘 맞습니다.',
-    건강운:'심장·소장·혀·혈액이 화(火) 기운과 연관됩니다. 여름철 혈압과 심장 관리에 주의하세요. 지나친 스트레스와 과음은 금물이며 명상, 요가 등 심신 안정 활동이 도움이 됩니다.',
-    학업운:'화(火) 기운은 직관력과 창의력이 강점입니다. 예체능, 인문학, 언어 계통에서 두각을 나타냅니다. 집중력의 기복이 있으므로 짧은 집중 학습과 적절한 휴식을 번갈아 가며 공부하는 것이 효율적입니다.',
-    대인관계:'화(火) 기운은 밝고 따뜻한 인간관계를 만듭니다. 사람을 끄는 매력이 있어 쉽게 친해지지만 때로는 지나치게 감정적이 될 수 있습니다. 경청하는 태도를 기르면 더 깊은 관계를 맺을 수 있습니다.',
-    가족운:'가족에게 따뜻하고 사랑이 넘치는 존재입니다. 가족 행사나 모임을 즐기며 분위기 메이커 역할을 합니다. 감정이 격해질 때는 잠시 자신을 돌아보고 평온함을 유지하는 것이 가족 화목에 도움이 됩니다.',
-    이사여행:'화(火) 기운은 남쪽이 유리합니다. 햇빛이 잘 드는 남향집이 기운을 살려줍니다. 여름 여행과 따뜻한 기후의 지역 방문이 에너지를 충전시켜 줍니다.',
-    총운:'화(火) 기운이 강한 당신은 열정과 창의성의 기질을 타고났습니다. 빠르게 타오르는 힘이 있어 단기간에 큰 성과를 낼 수 있습니다. 올해는 자신의 재능을 펼치는 해로, 용기 있게 나서되 지속성을 갖추면 더 큰 성공을 이룹니다.',
-  },
-  토: {
-    연애운:'토(土) 기운이 강한 당신은 안정적이고 신뢰받는 사랑을 합니다. 처음에는 신중하게 시작하지만 한번 마음을 열면 깊고 오래가는 관계를 만듭니다. 의리와 책임감이 강한 파트너와 잘 맞습니다.',
-    금전운:'토(土) 기운은 안정과 축적을 상징합니다. 재물을 차곡차곡 쌓는 능력이 뛰어납니다. 부동산이나 장기 적금이 유리하며 허황된 투자보다 안전한 자산관리 방식이 재물을 지킵니다.',
-    직업운:'토(土) 기운은 신뢰와 안정을 상징합니다. 공무원, 금융, 건설, 농업, 부동산 분야가 적합합니다. 꾸준하고 성실한 업무 태도로 조직에서 신망을 얻습니다.',
-    건강운:'비장·위·입·근육이 토(土) 기운과 연관됩니다. 소화기 건강 관리가 중요합니다. 식사를 규칙적으로 하고 과식을 삼가며 습한 환경을 피하는 것이 좋습니다.',
-    학업운:'토(土) 기운은 꾸준함과 성실함이 강점입니다. 반복 학습과 암기에 강하며 역사, 철학, 경제 계통에서 빛납니다. 단기 성과보다 장기적으로 실력을 쌓는 방식이 효과적입니다.',
-    대인관계:'토(土) 기운은 신뢰와 포용의 인간관계를 만듭니다. 주변 사람들의 든든한 버팀목이 되며 중재 능력이 뛰어납니다. 너무 많은 역할을 떠맡아 지치지 않도록 자신의 한계를 알고 조절하는 것이 중요합니다.',
-    가족운:'가족을 위해 희생을 아끼지 않는 헌신적인 성격입니다. 가정에서 중심축 역할을 하며 가족의 화목을 위해 노력합니다. 자신의 감정도 표현하며 가족과 소통하는 것이 장기적으로 좋습니다.',
-    이사여행:'토(土) 기운은 중앙이나 사방이 고루 유리합니다. 안정적인 주거 환경이 중요하며 지반이 튼튼한 곳이 좋습니다. 자연이 풍요로운 곳으로의 여행이 힐링이 됩니다.',
-    총운:'토(土) 기운이 강한 당신은 신뢰와 안정의 기질을 타고났습니다. 묵묵히 자신의 자리를 지키는 힘이 있어 주변의 신망을 얻습니다. 올해는 내실을 다지는 해로, 기반을 탄탄히 하고 관계를 돈독히 하면 큰 도움이 찾아옵니다.',
-  },
-  금: {
-    연애운:'금(金) 기운이 강한 당신은 분명하고 주관이 뚜렷한 사랑을 합니다. 한번 결정하면 흔들리지 않는 의리 있는 파트너입니다. 감정 표현을 좀 더 자주 하면 관계가 더욱 풍부해집니다.',
-    금전운:'금(金) 기운은 결단력과 절제를 상징합니다. 불필요한 지출을 줄이고 체계적으로 재산을 관리하는 능력이 뛰어납니다. 금속·광물 관련 투자나 가공업이 유리하며 원칙 있는 재무 관리가 부를 불러옵니다.',
-    직업운:'금(金) 기운은 정밀함과 결단력을 상징합니다. 법조, 의료, 군·경찰, 금융, 기계 분야가 적합합니다. 원칙과 규율을 중시하며 전문성을 갖춘 직종에서 두각을 나타냅니다.',
-    건강운:'폐·대장·코·피부가 금(金) 기운과 연관됩니다. 호흡기와 피부 관리에 주의하세요. 건조한 계절에 수분 섭취를 늘리고 규칙적인 유산소 운동이 도움이 됩니다.',
-    학업운:'금(金) 기운은 집중력과 분석력이 강점입니다. 수학, 과학, 법학, 의학 계통에서 뛰어난 성취를 보입니다. 목표를 명확히 설정하고 체계적으로 공부하는 방식이 효과적입니다.',
-    대인관계:'금(金) 기운은 원칙과 정의의 인간관계를 만듭니다. 한번 맺은 인연을 소중히 여기며 신의가 있습니다. 너무 엄격한 기준을 적용하지 말고 상대방의 실수를 너그럽게 받아들이는 여유가 필요합니다.',
-    가족운:'가족에게 강한 책임감과 보호 본능을 가집니다. 가족을 위해 어려운 결정도 내릴 수 있는 뚝심이 있습니다. 따뜻한 말 한마디가 가족 관계를 더욱 깊게 만든다는 것을 기억하세요.',
-    이사여행:'금(金) 기운은 서쪽과 서북쪽이 유리합니다. 높은 곳에 위치하거나 전망이 좋은 주거지가 좋습니다. 가을 여행, 서늘하고 맑은 기후의 여행지가 에너지를 회복시켜 줍니다.',
-    총운:'금(金) 기운이 강한 당신은 결단력과 추진력의 기질을 타고났습니다. 한번 목표를 정하면 끝까지 해내는 힘이 있습니다. 올해는 결실을 거두는 해로, 그동안의 노력이 빛을 발하며 명예와 성취가 찾아옵니다.',
-  },
-  수: {
-    연애운:'수(水) 기운이 강한 당신은 깊고 신비로운 사랑을 합니다. 감수성이 풍부하고 상대를 잘 이해하는 공감 능력이 뛰어납니다. 감정을 솔직하게 표현하는 연습을 하면 더 건강한 관계를 만들 수 있습니다.',
-    금전운:'수(水) 기운은 흐름과 유통을 상징합니다. 재물이 들어오고 나가는 흐름이 빠른 편입니다. 유통, 무역, 금융 분야에서 재물을 모으기 좋으며 저축 습관을 들여 흐르는 재물에 안정성을 더하세요.',
-    직업운:'수(水) 기운은 지혜와 소통을 상징합니다. 물류, 유통, 외교, 상담, IT, 연구 분야가 적합합니다. 아이디어와 정보를 다루는 직종에서 두각을 나타내며 변화를 두려워하지 않는 유연성이 강점입니다.',
-    건강운:'신장·방광·귀·뼈·혈액이 수(水) 기운과 연관됩니다. 겨울철 냉기와 습기를 조심하세요. 충분한 수면과 수분 섭취가 중요하며 신장 기능 유지를 위해 짠 음식을 줄이는 것이 좋습니다.',
-    학업운:'수(水) 기운은 기억력과 직관력이 강점입니다. 철학, 심리학, 언어, 예술 계통에서 탁월한 능력을 발휘합니다. 혼자 조용히 집중하는 환경에서 가장 높은 학습 효율을 냅니다.',
-    대인관계:'수(Water) 기운은 깊고 공감 능력 있는 인간관계를 만듭니다. 사람의 마음을 잘 읽어 상담사 역할을 자주 하게 됩니다. 에너지 소모를 막기 위해 자신의 감정 경계를 지키는 것이 중요합니다.',
-    가족운:'가족의 감정적 지지자 역할을 합니다. 가족 간의 감정을 잘 읽고 중재하는 능력이 뛰어납니다. 자신의 감정도 가족에게 솔직하게 표현하면 더 깊은 유대감을 쌓을 수 있습니다.',
-    이사여행:'수(水) 기운은 북쪽이 유리합니다. 물가 근처나 조용하고 아늑한 주거 환경이 기운을 살려줍니다. 겨울 온천 여행이나 바다·강변 여행이 에너지를 충전시켜 줍니다.',
-    총운:'수(水) 기운이 강한 당신은 지혜와 직관의 기질을 타고났습니다. 깊은 사고력과 유연한 적응력으로 어떤 환경에서도 살아남는 힘이 있습니다. 올해는 내면을 성장시키는 해로, 배움과 자기계발에 집중하면 다가오는 기회를 잡을 수 있습니다.',
-  },
-};
+let 현재사주 = null;
+let 현재카테고리 = '총운';
 
 const 카테고리목록 = ['총운','연애운','금전운','직업운','건강운','학업운','대인관계','가족운','이사여행'];
 const 카테고리이름 = {
@@ -624,20 +517,12 @@ const 카테고리이름 = {
   건강운:'건강운', 학업운:'학업운', 대인관계:'대인관계운', 가족운:'가족운', 이사여행:'이사/여행운',
 };
 
-// ════════════════════════════════════════════════
-//  사주 UI
-// ════════════════════════════════════════════════
-
-let 현재사주 = null;
-let 현재카테고리 = '총운';
-
 function calcSaju() {
-  const y = +document.getElementById('sel-year').value;
-  const m = +document.getElementById('sel-month').value;
-  const d = +document.getElementById('sel-day').value;
+  const y    = +document.getElementById('sel-year').value;
+  const m    = +document.getElementById('sel-month').value;
+  const d    = +document.getElementById('sel-day').value;
   const hVal = document.getElementById('sel-hour').value;
   const hour = hVal === '' ? null : +hVal;
-
   if (!y || !m || !d) { alert('년도, 월, 일을 선택해주세요.'); return; }
 
   const 년주 = getYearPillar(y, m, d);
@@ -647,52 +532,40 @@ function calcSaju() {
 
   const pillars = [년주, 월주, 일주, 시주].filter(Boolean);
   const ohaeng  = calcOhaeng(pillars);
-  const 주오행  = Object.entries(ohaeng).sort((a,b)=>b[1]-a[1])[0][0];
+  const 주오행  = Object.entries(ohaeng).sort((a,b) => b[1]-a[1])[0][0];
 
-  현재사주 = { 년주, 월주, 일주, 시주, ohaeng, 주오행, year: y, month: m, day: d };
+  현재사주 = { 년주, 월주, 일주, 시주, ohaeng, 주오행, year:y, month:m, day:d };
   localStorage.setItem('saju_birth', JSON.stringify({ y, m, d, h: hVal }));
 
   renderPillars();
   renderOhaeng();
   renderTabs();
-  showFortune(현재카테고리);
-
+  showFortune('총운');
   document.getElementById('saju-section').style.display = 'block';
-  document.getElementById('ai-saju-section').style.display = 'block';
-  document.getElementById('ai-saju-output').style.display = 'none';
-  document.getElementById('ai-saju-status').textContent = '';
 }
 
 function renderPillars() {
   const { 년주, 월주, 일주, 시주 } = 현재사주;
   const labels = ['년주','월주','일주','시주'];
-  const ps = [년주, 월주, 일주, 시주];
-  const container = document.getElementById('pillars');
-  container.innerHTML = '';
-  ps.forEach((p, i) => {
-    if (!p) return;
-    const div = document.createElement('div');
-    div.className = 'pillar';
-    div.innerHTML = `
+  const ps     = [년주, 월주, 일주, 시주];
+  document.getElementById('pillars').innerHTML = ps.map((p, i) => p ? `
+    <div class="pillar">
       <div class="pillar-label">${labels[i]}</div>
       <div class="pillar-gan" style="color:${오행색[천간오행[p.gan]]}">${p.gan}</div>
       <div class="pillar-ji"  style="color:${오행색[지지오행[p.ji]]}">${p.ji}</div>
       <div class="pillar-sub">${천간오행[p.gan]}·${지지오행[p.ji]}</div>
       <div class="pillar-sub" style="margin-top:2px">${지지동물[p.ji]}</div>
-    `;
-    container.appendChild(div);
-  });
+    </div>` : '').join('');
 }
 
 function renderOhaeng() {
   const { ohaeng } = 현재사주;
-  const total = Object.values(ohaeng).reduce((a,b)=>a+b,0);
+  const total = Object.values(ohaeng).reduce((a,b) => a+b, 0);
   document.getElementById('ohaeng').innerHTML = Object.entries(ohaeng).map(([oh, cnt]) => `
     <div class="oh-item">
       <div class="oh-name oh-${oh}" style="color:${오행색[oh]}">${oh}</div>
       <div class="oh-count">${cnt}/${total}</div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function renderTabs() {
@@ -704,16 +577,15 @@ function renderTabs() {
 function showFortune(cat) {
   현재카테고리 = cat;
   document.querySelectorAll('#fortune-tabs .tab').forEach(t =>
-    t.classList.toggle('active', t.textContent === 카테고리이름[cat])
-  );
+    t.classList.toggle('active', t.textContent === 카테고리이름[cat]));
   if (!현재사주) return;
   const { 주오행, 일주 } = 현재사주;
-  const 운세 = 오행운세[주오행]?.[cat] || '해석 준비 중입니다.';
-  const 일간설명 = cat === '총운' ? `\n\n일간(${일주.gan}) 기질: ${천간성격[일주.gan]}` : '';
-  document.getElementById('fortune-text').textContent = 운세 + 일간설명;
-  // 카테고리 바뀌면 AI 출력 숨기기
-  document.getElementById('ai-saju-output').style.display = 'none';
-  document.getElementById('ai-saju-status').textContent = '';
+  const box = document.getElementById('saju-interp');
+  box.style.display = 'none';
+  // force reflow for animation replay
+  void box.offsetWidth;
+  box.textContent = generateSajuText(주오행, 일주, cat);
+  box.style.display = 'block';
 }
 
 // ════════════════════════════════════════════════
@@ -721,47 +593,40 @@ function showFortune(cat) {
 // ════════════════════════════════════════════════
 
 const MAJOR_ARCANA = [
-  { num:'0',    name:'바보',         nameEn:'The Fool',          emoji:'🃏' },
-  { num:'I',    name:'마법사',       nameEn:'The Magician',      emoji:'🎩' },
-  { num:'II',   name:'여사제',       nameEn:'The High Priestess',emoji:'🌙' },
-  { num:'III',  name:'여황제',       nameEn:'The Empress',       emoji:'👑' },
-  { num:'IV',   name:'황제',         nameEn:'The Emperor',       emoji:'⚔️' },
-  { num:'V',    name:'교황',         nameEn:'The Hierophant',    emoji:'✝️' },
-  { num:'VI',   name:'연인',         nameEn:'The Lovers',        emoji:'💕' },
-  { num:'VII',  name:'전차',         nameEn:'The Chariot',       emoji:'🏆' },
-  { num:'VIII', name:'힘',           nameEn:'Strength',          emoji:'🦁' },
-  { num:'IX',   name:'은둔자',       nameEn:'The Hermit',        emoji:'🕯️' },
-  { num:'X',    name:'운명의 바퀴',  nameEn:'Wheel of Fortune',  emoji:'🎡' },
-  { num:'XI',   name:'정의',         nameEn:'Justice',           emoji:'⚖️' },
-  { num:'XII',  name:'매달린 남자',  nameEn:'The Hanged Man',    emoji:'🙃' },
-  { num:'XIII', name:'죽음',         nameEn:'Death',             emoji:'🦋' },
-  { num:'XIV',  name:'절제',         nameEn:'Temperance',        emoji:'🌊' },
-  { num:'XV',   name:'악마',         nameEn:'The Devil',         emoji:'😈' },
-  { num:'XVI',  name:'탑',           nameEn:'The Tower',         emoji:'⚡' },
-  { num:'XVII', name:'별',           nameEn:'The Star',          emoji:'⭐' },
-  { num:'XVIII',name:'달',           nameEn:'The Moon',          emoji:'🌕' },
-  { num:'XIX',  name:'태양',         nameEn:'The Sun',           emoji:'☀️' },
-  { num:'XX',   name:'심판',         nameEn:'Judgement',         emoji:'🎺' },
-  { num:'XXI',  name:'세계',         nameEn:'The World',         emoji:'🌍' },
+  { num:'0',    name:'바보',          nameEn:'The Fool',          emoji:'🃏' },
+  { num:'I',    name:'마법사',        nameEn:'The Magician',      emoji:'🎩' },
+  { num:'II',   name:'여사제',        nameEn:'The High Priestess',emoji:'🌙' },
+  { num:'III',  name:'여황제',        nameEn:'The Empress',       emoji:'👑' },
+  { num:'IV',   name:'황제',          nameEn:'The Emperor',       emoji:'⚔️' },
+  { num:'V',    name:'교황',          nameEn:'The Hierophant',    emoji:'✝️' },
+  { num:'VI',   name:'연인',          nameEn:'The Lovers',        emoji:'💕' },
+  { num:'VII',  name:'전차',          nameEn:'The Chariot',       emoji:'🏆' },
+  { num:'VIII', name:'힘',            nameEn:'Strength',          emoji:'🦁' },
+  { num:'IX',   name:'은둔자',        nameEn:'The Hermit',        emoji:'🕯️' },
+  { num:'X',    name:'운명의 바퀴',   nameEn:'Wheel of Fortune',  emoji:'🎡' },
+  { num:'XI',   name:'정의',          nameEn:'Justice',           emoji:'⚖️' },
+  { num:'XII',  name:'매달린 남자',   nameEn:'The Hanged Man',    emoji:'🙃' },
+  { num:'XIII', name:'죽음',          nameEn:'Death',             emoji:'🦋' },
+  { num:'XIV',  name:'절제',          nameEn:'Temperance',        emoji:'🌊' },
+  { num:'XV',   name:'악마',          nameEn:'The Devil',         emoji:'😈' },
+  { num:'XVI',  name:'탑',            nameEn:'The Tower',         emoji:'⚡' },
+  { num:'XVII', name:'별',            nameEn:'The Star',          emoji:'⭐' },
+  { num:'XVIII',name:'달',            nameEn:'The Moon',          emoji:'🌕' },
+  { num:'XIX',  name:'태양',          nameEn:'The Sun',           emoji:'☀️' },
+  { num:'XX',   name:'심판',          nameEn:'Judgement',         emoji:'🎺' },
+  { num:'XXI',  name:'세계',          nameEn:'The World',         emoji:'🌍' },
 ];
 
 const MINOR_SUITS    = ['완드','컵','소드','펜타클'];
 const SUIT_EMOJI     = { 완드:'🔥', 컵:'💧', 소드:'⚡', 펜타클:'🌿' };
-const SUIT_THEME     = { 완드:'열정·창의', 컵:'감정·관계', 소드:'사고·갈등', 펜타클:'물질·현실' };
 const SUIT_EN        = { 완드:'Wands', 컵:'Cups', 소드:'Swords', 펜타클:'Pentacles' };
 const MINOR_RANKS    = ['에이스','2','3','4','5','6','7','8','9','10','페이지','나이트','퀸','킹'];
-const MINOR_RANKS_EN = ['Ace','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Page','Knight','Queen','King'];
 
 function buildDeck() {
   const deck = [...MAJOR_ARCANA.map(c => ({ ...c, type:'major' }))];
   MINOR_SUITS.forEach(suit => {
     MINOR_RANKS.forEach((rank, i) => {
-      deck.push({
-        num: String(i+1), name: `${suit}의 ${rank}`,
-        nameEn: `${MINOR_RANKS_EN[i]} of ${SUIT_EN[suit]}`,
-        emoji: SUIT_EMOJI[suit], type: 'minor', suit,
-        theme: SUIT_THEME[suit],
-      });
+      deck.push({ num:String(i+1), name:`${suit}의 ${rank}`, emoji:SUIT_EMOJI[suit], type:'minor', suit });
     });
   });
   return deck;
@@ -800,82 +665,89 @@ const SUIT_MEANINGS = {
 };
 
 function getCardMeaning(card, isReversed) {
-  const meanings = card.type === 'major' ? MAJOR_MEANINGS[card.name] : SUIT_MEANINGS[card.suit];
-  if (!meanings) return '이 카드는 변화와 새로운 가능성을 나타냅니다.';
-  return isReversed ? (meanings.rev || meanings.up) : meanings.up;
+  const m = card.type === 'major' ? MAJOR_MEANINGS[card.name] : SUIT_MEANINGS[card.suit];
+  if (!m) return '이 카드는 변화와 새로운 가능성을 나타냅니다.';
+  return isReversed ? (m.rev || m.up) : m.up;
 }
 
 // ════════════════════════════════════════════════
-//  타로 UI
+//  타로 UI — 카드 뒤집기
 // ════════════════════════════════════════════════
 
-let drawnCards = [];
+let drawnCards    = [];
+let _flippedCount = 0;
+
+const SPREAD_LABELS = ['과거','현재','미래'];
 
 function drawTarot() {
-  const spreadN = parseInt(document.getElementById('tarot-spread').value);
-  const cat     = document.getElementById('tarot-cat').value;
+  const spreadN  = parseInt(document.getElementById('tarot-spread').value);
   const shuffled = [...FULL_DECK].sort(() => Math.random() - 0.5);
-  drawnCards = shuffled.slice(0, spreadN).map(card => ({
-    ...card, reversed: Math.random() < 0.3,
-  }));
-  renderTarotDeck(spreadN);
-  renderTarotResult(spreadN, cat);
-  document.getElementById('ai-tarot-btn-row').style.display = 'flex';
-  document.getElementById('ai-tarot-note').style.display = '';
-  document.getElementById('ai-tarot-output').style.display = 'none';
-  document.getElementById('ai-tarot-status').textContent = '';
-}
+  drawnCards = shuffled.slice(0, spreadN).map(c => ({ ...c, reversed: Math.random() < 0.3 }));
+  _flippedCount = 0;
 
-const SPREAD_LABELS_3 = ['과거','현재','미래'];
+  document.getElementById('tarot-interp').style.display = 'none';
+  document.getElementById('tarot-interp').textContent   = '';
 
-function renderTarotDeck(spreadN) {
+  // Face-down cards
+  const hint = document.getElementById('flip-hint');
+  hint.textContent = spreadN === 1
+    ? '카드를 클릭해서 뒤집어보세요'
+    : `카드를 한 장씩 클릭해서 뒤집어보세요 (${spreadN}장)`;
+  hint.style.display = '';
+
   document.getElementById('tarot-deck').innerHTML = drawnCards.map((card, i) => `
-    <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
-      <div class="tarot-card revealed ${card.reversed ? 'reversed' : ''}">
-        <div style="font-size:2rem">${card.emoji}</div>
-        <div class="card-name">${card.name}</div>
-        <div class="card-num">${card.num}</div>
+    <div class="card-slot" id="slot-${i}" onclick="flipCard(${i})">
+      <div class="card-flip-wrap">
+        <div class="card-flip ${card.reversed ? 'is-reversed' : ''}" id="card-flip-${i}">
+          <div class="card-face card-face-back">
+            <div class="back-symbol">✦</div>
+            <div class="back-label">TAROT</div>
+          </div>
+          <div class="card-face card-face-front">
+            <div style="font-size:2rem">${card.emoji}</div>
+            <div class="card-name">${card.name}</div>
+            <div class="card-num">${card.num}</div>
+            ${card.reversed ? '<div class="card-rev">역방향</div>' : ''}
+          </div>
+        </div>
       </div>
-      ${spreadN === 3 ? `<div class="spread-label">${SPREAD_LABELS_3[i]}</div>` : ''}
-      ${card.reversed ? '<div style="font-size:.65rem;color:#7c6a9a">역방향</div>' : ''}
+      ${spreadN === 3 ? `<div class="spread-label">${SPREAD_LABELS[i]}</div>` : ''}
     </div>
   `).join('');
 }
 
-function renderTarotResult(spreadN, cat) {
-  const catLabel = document.querySelector('#tarot-cat option:checked').text;
-  const items = drawnCards.map((card, i) => {
-    const label = spreadN === 3
-      ? `${SPREAD_LABELS_3[i]} — ${card.name}${card.reversed ? ' (역)' : ''}`
-      : `${card.name}${card.reversed ? ' (역방향)' : ''}`;
-    return `
-      <div class="tarot-interp">
-        <h4>${label}</h4>
-        <p>${getCardMeaning(card, card.reversed)}</p>
-      </div>`;
-  }).join('');
+function flipCard(idx) {
+  const flip = document.getElementById('card-flip-' + idx);
+  const slot = document.getElementById('slot-' + idx);
+  if (!flip || flip.classList.contains('flipped')) return;
 
-  const summary = spreadN === 3
-    ? `<div class="tarot-interp"><h4>📌 ${catLabel} 종합 해석</h4><p>${getSummary(drawnCards, cat)}</p></div>`
-    : '';
-  document.getElementById('tarot-result').innerHTML = items + summary;
+  flip.classList.add('flipped');
+  slot.classList.add('done'); // stops hover glow
+  slot.style.cursor = 'default';
+  _flippedCount++;
+
+  const hint = document.getElementById('flip-hint');
+  const remaining = drawnCards.length - _flippedCount;
+  if (remaining > 0) {
+    hint.textContent = `${remaining}장 남았습니다. 계속 클릭해서 뒤집어보세요`;
+  } else {
+    hint.style.display = 'none';
+    // 모든 카드 뒤집힘 → 해석 표시
+    setTimeout(() => showTarotInterp(), 700);
+  }
 }
 
-function getSummary(cards, cat) {
-  const names = cards.map(c => c.name).join(', ');
-  const pos = cards.some(c => !c.reversed && ['태양','별','세계','연인','전차'].includes(c.name));
-  const neg = cards.some(c => c.reversed || ['탑','악마','달'].includes(c.name));
-  const cn  = { 총운:'전반적인 운세', 연애운:'연애', 금전운:'금전', 직업운:'직업·사업',
-                건강운:'건강', 학업운:'학업', 대인관계:'대인관계', 가족운:'가족', 이사여행:'이사·여행' }[cat] || cat;
-  if (pos && !neg)
-    return `세 장의 카드(${names})가 모두 긍정적인 흐름을 나타냅니다. ${cn} 방면에서 좋은 에너지가 흐르고 있으니 자신감을 갖고 나아가세요.`;
-  if (neg)
-    return `카드(${names})가 도전과 성장의 흐름을 보여줍니다. ${cn} 방면에서 신중함이 필요한 시기이나, 이 과정이 결국 더 큰 성장으로 이어질 것입니다.`;
-  return `세 장의 카드(${names})가 균형 잡힌 흐름을 나타냅니다. ${cn} 방면에서 꾸준한 노력과 균형 감각이 좋은 결과를 가져올 것입니다.`;
+function showTarotInterp() {
+  const cat   = document.getElementById('tarot-cat').value;
+  const box   = document.getElementById('tarot-interp');
+  box.style.display = 'none';
+  void box.offsetWidth;
+  box.textContent   = generateTarotText(drawnCards, cat);
+  box.style.display = 'block';
 }
 
 // ════════════════════════════════════════════════
-//  AI 해석 — 한국어 템플릿 생성기
+//  운세 텍스트 생성기 (한국어 템플릿 기반)
 // ════════════════════════════════════════════════
 
 const 오행특성 = {
@@ -896,169 +768,115 @@ const 오행특성 = {
         상징:'물처럼 깊고 유연하게 흐르는' },
 };
 
-const 카테고리템플릿 = {
+const 카테고리풀 = {
   총운: {
-    오프닝: [
-      '올해의 전반적인 기운은 변화와 성장이 교차하는 흐름입니다.',
-      '이번 한 해는 새로운 씨앗을 뿌리기에 좋은 시기입니다.',
-      '올해는 그동안의 노력이 결실을 맺기 시작하는 흐름입니다.',
-      '전반적으로 안정 속에서 도약의 기회를 잡는 한 해가 될 것입니다.',
-    ],
-    조언: [
-      '주변 사람들과의 협력을 아끼지 마세요.',
-      '서두르지 않고 한 걸음씩 나아가는 것이 최선입니다.',
-      '새로운 도전을 두려워하지 말고 과감하게 시도해 보세요.',
-      '내면의 목소리에 귀 기울이면 좋은 선택을 할 수 있습니다.',
-    ],
-    마무리: [
-      '뜻깊은 성과와 성장이 당신을 기다리고 있습니다.',
-      '한 해를 돌아볼 때 후회 없는 선택들이 쌓여 있을 것입니다.',
-      '꾸준히 나아가면 연말에 뿌듯한 결실을 확인하게 될 것입니다.',
-    ],
+    오프닝:['올해의 전반적인 기운은 변화와 성장이 교차하는 흐름입니다.',
+            '이번 한 해는 새로운 씨앗을 뿌리기에 좋은 시기입니다.',
+            '올해는 그동안의 노력이 결실을 맺기 시작하는 흐름입니다.',
+            '전반적으로 안정 속에서 도약의 기회를 잡는 한 해가 될 것입니다.'],
+    조언: ['주변 사람들과의 협력을 아끼지 마세요.',
+           '서두르지 않고 한 걸음씩 나아가는 것이 최선입니다.',
+           '새로운 도전을 두려워하지 말고 과감하게 시도해 보세요.',
+           '내면의 목소리에 귀 기울이면 좋은 선택을 할 수 있습니다.'],
+    마무리:['뜻깊은 성과와 성장이 당신을 기다리고 있습니다.',
+            '한 해를 돌아볼 때 후회 없는 선택들이 쌓여 있을 것입니다.',
+            '꾸준히 나아가면 연말에 뿌듯한 결실을 확인하게 될 것입니다.'],
   },
   연애운: {
-    오프닝: [
-      '연애 방면에서는 감정의 물결이 섬세하게 흐르고 있습니다.',
-      '인연의 기운이 활발하게 움직이고 있는 시기입니다.',
-      '사랑 면에서 새로운 바람이 불어오는 기운이 있습니다.',
-    ],
-    조언: [
-      '솔직한 감정 표현이 관계를 한층 깊게 만들어 줍니다.',
-      '상대방의 입장을 먼저 헤아리는 배려가 큰 힘이 됩니다.',
-      '작은 관심과 진심이 큰 감동으로 돌아옵니다.',
-      '자기 자신을 사랑하는 마음이 좋은 인연을 끌어당깁니다.',
-    ],
-    마무리: [
-      '따뜻하고 소중한 인연이 당신 가까이 있습니다.',
-      '설레는 감정과 깊어지는 유대감이 찾아올 것입니다.',
-      '인연이 더욱 깊어지고 단단해지는 계기가 마련됩니다.',
-    ],
+    오프닝:['연애 방면에서는 감정의 물결이 섬세하게 흐르고 있습니다.',
+            '인연의 기운이 활발하게 움직이고 있는 시기입니다.',
+            '사랑 면에서 새로운 바람이 불어오는 기운이 있습니다.'],
+    조언: ['솔직한 감정 표현이 관계를 한층 깊게 만들어 줍니다.',
+           '상대방의 입장을 먼저 헤아리는 배려가 큰 힘이 됩니다.',
+           '작은 관심과 진심이 큰 감동으로 돌아옵니다.',
+           '자기 자신을 사랑하는 마음이 좋은 인연을 끌어당깁니다.'],
+    마무리:['따뜻하고 소중한 인연이 당신 가까이 있습니다.',
+            '설레는 감정과 깊어지는 유대감이 찾아올 것입니다.',
+            '인연이 더욱 깊어지고 단단해지는 계기가 마련됩니다.'],
   },
   금전운: {
-    오프닝: [
-      '재물 면에서는 흐름이 서서히 안정을 찾아가고 있습니다.',
-      '금전적으로 새로운 기회의 싹이 트이는 시기입니다.',
-      '경제적 흐름을 보면 노력이 결실로 이어지는 흐름이 보입니다.',
-    ],
-    조언: [
-      '계획적인 소비와 꾸준한 저축 습관이 중요합니다.',
-      '충동적인 지출을 줄이고 장기적 안목으로 관리하세요.',
-      '새로운 수입원이나 기회를 열린 마음으로 살펴보세요.',
-      '신중하게 판단하되 좋은 기회가 왔을 때 놓치지 마세요.',
-    ],
-    마무리: [
-      '재물이 차곡차곡 쌓이는 흐름이 이어질 것입니다.',
-      '예상치 못한 좋은 기회가 재정에 활력을 불어넣을 수 있습니다.',
-      '노력한 만큼의 결실이 차분히 모여드는 시기입니다.',
-    ],
+    오프닝:['재물 면에서는 흐름이 서서히 안정을 찾아가고 있습니다.',
+            '금전적으로 새로운 기회의 싹이 트이는 시기입니다.',
+            '경제적 흐름을 보면 노력이 결실로 이어지는 흐름이 보입니다.'],
+    조언: ['계획적인 소비와 꾸준한 저축 습관이 중요합니다.',
+           '충동적인 지출을 줄이고 장기적 안목으로 관리하세요.',
+           '새로운 수입원이나 기회를 열린 마음으로 살펴보세요.',
+           '신중하게 판단하되 좋은 기회가 왔을 때 놓치지 마세요.'],
+    마무리:['재물이 차곡차곡 쌓이는 흐름이 이어질 것입니다.',
+            '예상치 못한 좋은 기회가 재정에 활력을 불어넣을 수 있습니다.',
+            '노력한 만큼의 결실이 차분히 모여드는 시기입니다.'],
   },
   직업운: {
-    오프닝: [
-      '직업과 사업 면에서는 성장과 변화의 흐름이 감지됩니다.',
-      '커리어 방면에서 새로운 전환점이 될 수 있는 시기입니다.',
-      '일 방면에서 그동안의 노력이 빛을 발하기 시작하는 흐름입니다.',
-    ],
-    조언: [
-      '자신의 강점을 전면에 내세울 때가 왔습니다.',
-      '팀워크를 중시하면 더 큰 시너지를 만들 수 있습니다.',
-      '새로운 기술이나 지식 습득이 도움이 되는 시기입니다.',
-      '꾸준한 노력과 성실함이 신뢰를 쌓아드립니다.',
-    ],
-    마무리: [
-      '성과가 주변에 인정받는 시기가 다가옵니다.',
-      '뜻하는 방향으로 한 걸음씩 확실한 진전이 있을 것입니다.',
-      '목표에 점점 가까워지고 있음을 느끼게 될 것입니다.',
-    ],
+    오프닝:['직업과 사업 면에서는 성장과 변화의 흐름이 감지됩니다.',
+            '커리어 방면에서 새로운 전환점이 될 수 있는 시기입니다.',
+            '일 방면에서 그동안의 노력이 빛을 발하기 시작하는 흐름입니다.'],
+    조언: ['자신의 강점을 전면에 내세울 때가 왔습니다.',
+           '팀워크를 중시하면 더 큰 시너지를 만들 수 있습니다.',
+           '새로운 기술이나 지식 습득이 도움이 되는 시기입니다.',
+           '꾸준한 노력과 성실함이 신뢰를 쌓아드립니다.'],
+    마무리:['성과가 주변에 인정받는 시기가 다가옵니다.',
+            '뜻하는 방향으로 한 걸음씩 확실한 진전이 있을 것입니다.',
+            '목표에 점점 가까워지고 있음을 느끼게 될 것입니다.'],
   },
   건강운: {
-    오프닝: [
-      '건강 면에서는 몸과 마음의 균형이 중요한 시기입니다.',
-      '활력의 흐름을 보면 에너지를 잘 관리해야 할 시기입니다.',
-      '건강 기운이 회복과 재충전의 사이클에 있습니다.',
-    ],
-    조언: [
-      '규칙적인 생활 습관이 건강의 기반이 됩니다.',
-      '스트레스를 제때 풀어주는 것이 무엇보다 중요합니다.',
-      '충분한 수면과 적당한 운동으로 에너지를 보충하세요.',
-      '몸이 보내는 신호를 무시하지 말고 주의 깊게 살펴보세요.',
-    ],
-    마무리: [
-      '꾸준한 자기 관리가 건강한 활력으로 이어집니다.',
-      '몸과 마음이 조화를 찾아 활기를 되찾을 수 있습니다.',
-      '건강한 일상을 지켜나가면 든든한 에너지가 함께합니다.',
-    ],
+    오프닝:['건강 면에서는 몸과 마음의 균형이 중요한 시기입니다.',
+            '활력의 흐름을 보면 에너지를 잘 관리해야 할 시기입니다.',
+            '건강 기운이 회복과 재충전의 사이클에 있습니다.'],
+    조언: ['규칙적인 생활 습관이 건강의 기반이 됩니다.',
+           '스트레스를 제때 풀어주는 것이 무엇보다 중요합니다.',
+           '충분한 수면과 적당한 운동으로 에너지를 보충하세요.',
+           '몸이 보내는 신호를 무시하지 말고 주의 깊게 살펴보세요.'],
+    마무리:['꾸준한 자기 관리가 건강한 활력으로 이어집니다.',
+            '몸과 마음이 조화를 찾아 활기를 되찾을 수 있습니다.',
+            '건강한 일상을 지켜나가면 든든한 에너지가 함께합니다.'],
   },
   학업운: {
-    오프닝: [
-      '학업 방면에서는 집중력과 인내가 빛을 발하는 시기입니다.',
-      '배움의 흐름을 보면 꾸준한 노력이 중요한 시점입니다.',
-      '공부 면에서 실력이 쌓이고 성장하는 흐름이 보입니다.',
-    ],
-    조언: [
-      '목표를 명확히 세우고 한 가지씩 집중하는 것이 효율적입니다.',
-      '기초를 단단히 다지는 과정이 나중에 큰 힘이 됩니다.',
-      '규칙적인 학습 루틴을 만들어 꾸준히 지켜나가세요.',
-      '모르는 것을 부끄러워하지 말고 적극적으로 질문하세요.',
-    ],
-    마무리: [
-      '노력이 좋은 결과로 이어지는 흐름이 만들어집니다.',
-      '실력이 조금씩 쌓여 빛나는 성과로 나타날 것입니다.',
-      '꾸준함이 결국 목표를 향한 가장 빠른 길임을 알게 됩니다.',
-    ],
+    오프닝:['학업 방면에서는 집중력과 인내가 빛을 발하는 시기입니다.',
+            '배움의 흐름을 보면 꾸준한 노력이 중요한 시점입니다.',
+            '공부 면에서 실력이 쌓이고 성장하는 흐름이 보입니다.'],
+    조언: ['목표를 명확히 세우고 한 가지씩 집중하는 것이 효율적입니다.',
+           '기초를 단단히 다지는 과정이 나중에 큰 힘이 됩니다.',
+           '규칙적인 학습 루틴을 만들어 꾸준히 지켜나가세요.',
+           '모르는 것을 부끄러워하지 말고 적극적으로 질문하세요.'],
+    마무리:['노력이 좋은 결과로 이어지는 흐름이 만들어집니다.',
+            '실력이 조금씩 쌓여 빛나는 성과로 나타날 것입니다.',
+            '꾸준함이 결국 목표를 향한 가장 빠른 길임을 알게 됩니다.'],
   },
   대인관계: {
-    오프닝: [
-      '대인관계 면에서는 진심이 통하는 흐름이 이어지고 있습니다.',
-      '인간관계에서 새로운 인연과 깊어지는 관계가 기다립니다.',
-      '사람과의 관계에서 따뜻한 변화가 일어나는 시기입니다.',
-    ],
-    조언: [
-      '먼저 다가가는 작은 용기가 관계를 넓혀줍니다.',
-      '상대의 이야기를 먼저 듣는 자세가 깊은 신뢰를 만듭니다.',
-      '오해는 솔직한 소통으로 빠르게 풀어나가세요.',
-      '진심은 언제나 상대방에게 전해지게 되어 있습니다.',
-    ],
-    마무리: [
-      '좋은 사람들이 당신 주변으로 자연스럽게 모여듭니다.',
-      '신뢰할 수 있는 관계가 더욱 단단해지는 시기입니다.',
-      '새로운 좋은 인연이 삶에 활력을 불어넣을 것입니다.',
-    ],
+    오프닝:['대인관계 면에서는 진심이 통하는 흐름이 이어지고 있습니다.',
+            '인간관계에서 새로운 인연과 깊어지는 관계가 기다립니다.',
+            '사람과의 관계에서 따뜻한 변화가 일어나는 시기입니다.'],
+    조언: ['먼저 다가가는 작은 용기가 관계를 넓혀줍니다.',
+           '상대의 이야기를 먼저 듣는 자세가 깊은 신뢰를 만듭니다.',
+           '오해는 솔직한 소통으로 빠르게 풀어나가세요.',
+           '진심은 언제나 상대방에게 전해지게 되어 있습니다.'],
+    마무리:['좋은 사람들이 당신 주변으로 자연스럽게 모여듭니다.',
+            '신뢰할 수 있는 관계가 더욱 단단해지는 시기입니다.',
+            '새로운 좋은 인연이 삶에 활력을 불어넣을 것입니다.'],
   },
   가족운: {
-    오프닝: [
-      '가족 관계 면에서는 따뜻한 기운이 가정 안에 흐르고 있습니다.',
-      '가정의 흐름을 보면 소통과 화합이 중심이 되는 시기입니다.',
-      '가족과의 인연이 더욱 깊어지는 흐름이 감지됩니다.',
-    ],
-    조언: [
-      '작은 관심과 다정한 말 한마디가 가족을 따뜻하게 합니다.',
-      '가족과 함께하는 시간을 소중히 여기고 의식적으로 만드세요.',
-      '갈등이 있다면 먼저 손을 내미는 용기가 화목을 부릅니다.',
-      '가족 각자의 생각과 감정을 존중하는 태도가 중요합니다.',
-    ],
-    마무리: [
-      '가정에 화목하고 온화한 기운이 더욱 깊어질 것입니다.',
-      '가족 간 유대가 돈독해지는 소중한 시간이 기다립니다.',
-      '소소하지만 행복한 가족의 순간들이 쌓여갈 것입니다.',
-    ],
+    오프닝:['가족 관계 면에서는 따뜻한 기운이 가정 안에 흐르고 있습니다.',
+            '가정의 흐름을 보면 소통과 화합이 중심이 되는 시기입니다.',
+            '가족과의 인연이 더욱 깊어지는 흐름이 감지됩니다.'],
+    조언: ['작은 관심과 다정한 말 한마디가 가족을 따뜻하게 합니다.',
+           '가족과 함께하는 시간을 소중히 여기고 의식적으로 만드세요.',
+           '갈등이 있다면 먼저 손을 내미는 용기가 화목을 부릅니다.',
+           '가족 각자의 생각과 감정을 존중하는 태도가 중요합니다.'],
+    마무리:['가정에 화목하고 온화한 기운이 더욱 깊어질 것입니다.',
+            '가족 간 유대가 돈독해지는 소중한 시간이 기다립니다.',
+            '소소하지만 행복한 가족의 순간들이 쌓여갈 것입니다.'],
   },
   이사여행: {
-    오프닝: [
-      '이사·여행 면에서는 새로운 환경이 좋은 기운을 가져다줍니다.',
-      '이동과 변화의 흐름이 긍정적인 에너지를 품고 있습니다.',
-      '움직임의 기운을 보면 새로운 경험이 큰 자양분이 됩니다.',
-    ],
-    조언: [
-      '미리 꼼꼼하게 계획을 세우면 더 순조롭게 진행됩니다.',
-      '자신에게 맞는 방향과 시기를 신중하게 살펴보세요.',
-      '낯선 환경에 열린 마음으로 다가가면 귀한 경험을 얻습니다.',
-      '믿을 수 있는 사람과 함께 움직이면 힘이 됩니다.',
-    ],
-    마무리: [
-      '새로운 환경이 삶에 신선한 활력을 불어넣을 것입니다.',
-      '기대했던 변화가 순조롭게 이루어지는 흐름입니다.',
-      '이동이나 여행에서 뜻밖의 좋은 인연과 경험을 만날 수 있습니다.',
-    ],
+    오프닝:['이사·여행 면에서는 새로운 환경이 좋은 기운을 가져다줍니다.',
+            '이동과 변화의 흐름이 긍정적인 에너지를 품고 있습니다.',
+            '움직임의 기운을 보면 새로운 경험이 큰 자양분이 됩니다.'],
+    조언: ['미리 꼼꼼하게 계획을 세우면 더 순조롭게 진행됩니다.',
+           '자신에게 맞는 방향과 시기를 신중하게 살펴보세요.',
+           '낯선 환경에 열린 마음으로 다가가면 귀한 경험을 얻습니다.',
+           '믿을 수 있는 사람과 함께 움직이면 힘이 됩니다.'],
+    마무리:['새로운 환경이 삶에 신선한 활력을 불어넣을 것입니다.',
+            '기대했던 변화가 순조롭게 이루어지는 흐름입니다.',
+            '이동이나 여행에서 뜻밖의 좋은 인연과 경험을 만날 수 있습니다.'],
   },
 };
 
@@ -1070,122 +888,58 @@ const 일간멘트 = {
   임:'넓은 시야와 유연한 사고방식의',   계:'깊은 직관과 풍부한 감수성을 지닌',
 };
 
-function _pickR(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function _r(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
 function generateSajuText(주오행, 일주, cat) {
-  const 특성 = 오행특성[주오행];
-  const 템플릿 = 카테고리템플릿[cat] || 카테고리템플릿['총운'];
-  const 강점1 = _pickR(특성.강점);
-  const 강점2 = 특성.강점.filter(s => s !== 강점1)[Math.floor(Math.random() * (특성.강점.length - 1))];
-  const 약점  = _pickR(특성.약점);
-  const 일간  = 일간멘트[일주.gan] || '';
-
+  const 특성  = 오행특성[주오행];
+  const 풀    = 카테고리풀[cat] || 카테고리풀['총운'];
+  const 강점1 = _r(특성.강점);
+  const 강점2 = _r(특성.강점.filter(s => s !== 강점1));
+  const 약점  = _r(특성.약점);
   return [
-    `${일간} ${일주.gan}일간과 ${특성.상징} ${주오행}(${['목','화','토','금','수'].indexOf(주오행)+1}행) 기운이 어우러진 당신은 ${강점1}과(와) ${강점2}이(가) 돋보이는 분입니다.`,
-    _pickR(템플릿.오프닝),
-    _pickR(템플릿.조언),
-    `${_pickR(템플릿.마무리)} 단, ${약점}에 주의하면 더욱 좋은 흐름을 이어갈 수 있습니다.`,
-  ].join(' ');
+    `${일간멘트[일주.gan] || ''} ${일주.gan}일간과 ${특성.상징} ${주오행} 기운이 어우러진 당신은 ${강점1}과(와) ${강점2}이(가) 돋보이는 분입니다.`,
+    _r(풀.오프닝),
+    _r(풀.조언),
+    `${_r(풀.마무리)} 단, ${약점}에 주의하면 더욱 좋은 흐름을 이어갈 수 있습니다.`,
+  ].join('\n\n');
 }
 
-const 타로카테고리멘트 = {
-  총운: ['올해 전반적인 흐름에서', '당신의 큰 그림을 바라볼 때', '전체적인 운의 흐름에서'],
-  연애운: ['사랑과 인연의 흐름에서', '감정과 관계의 측면에서', '연애 방면을 바라보면'],
-  금전운: ['재물과 경제적 흐름에서', '금전 면을 살펴보면', '물질적 풍요의 흐름에서'],
-  직업운: ['직업과 사업의 흐름에서', '커리어 방면을 바라보면', '일과 성취의 면에서'],
-  건강운: ['몸과 마음의 흐름에서', '건강 방면을 살펴보면', '활력과 에너지 흐름에서'],
-  학업운: ['배움과 성장의 흐름에서', '학업 방면을 바라보면', '지식과 실력의 측면에서'],
-  대인관계: ['사람과의 관계 흐름에서', '인간관계를 살펴보면', '주변 인연의 흐름에서'],
-  가족운: ['가족과의 인연 흐름에서', '가정의 기운을 바라보면', '가족 관계의 측면에서'],
-  이사여행: ['이동과 변화의 흐름에서', '여행과 새 환경을 바라보면', '움직임의 기운에서'],
+const 카테고리컨텍스트 = {
+  총운:'전반적인 운세',     연애운:'사랑과 인연',    금전운:'재물과 금전',
+  직업운:'직업과 사업',    건강운:'건강과 활력',     학업운:'학업과 성장',
+  대인관계:'대인관계',     가족운:'가족',             이사여행:'이동과 여행',
 };
-
 const 포지션멘트 = {
-  과거: ['지나온 흐름은', '과거의 에너지는', '걸어온 길을 돌아보면'],
-  현재: ['지금 이 순간은', '현재의 에너지는', '지금 당신에게는'],
-  미래: ['앞으로의 흐름은', '다가올 에너지는', '미래를 바라보면'],
+  과거: ['지나온 흐름은','과거의 에너지는','걸어온 길을 돌아보면'],
+  현재: ['지금 이 순간은','현재의 에너지는','지금 당신에게는'],
+  미래: ['앞으로의 흐름은','다가올 에너지는','미래를 바라보면'],
 };
 
 function generateTarotText(cards, cat) {
-  const catMent = _pickR(타로카테고리멘트[cat] || 타로카테고리멘트['총운']);
-  const lines = [];
+  const ctx = 카테고리컨텍스트[cat] || cat;
+  const lines = [`${ctx} 방면에서 카드가 이야기합니다.\n`];
 
   if (cards.length === 1) {
     const c = cards[0];
-    const meaning = getCardMeaning(c, c.reversed);
-    lines.push(`${catMent} ${c.name}${c.reversed ? '(역방향)' : ''} 카드가 나타났습니다.`);
-    lines.push(meaning);
-    lines.push(_pickR(['이 에너지를 잘 활용하면 원하는 방향으로 나아갈 수 있습니다.', '카드가 가리키는 방향을 따라 한 걸음씩 나아가세요.', '이 흐름 속에서 자신만의 길을 찾아가시기 바랍니다.']));
+    lines.push(`${c.name}${c.reversed ? ' (역방향)' : ''} — ${getCardMeaning(c, c.reversed)}`);
+    lines.push(_r(['이 에너지를 잘 활용하면 원하는 방향으로 나아갈 수 있습니다.',
+                   '카드가 가리키는 방향을 따라 한 걸음씩 나아가세요.',
+                   '이 흐름 속에서 자신만의 길을 찾아가시기 바랍니다.']));
   } else {
-    lines.push(`${catMent} 세 장의 카드가 당신의 흐름을 이야기합니다.`);
     cards.forEach((c, i) => {
-      const pos = SPREAD_LABELS_3[i];
-      const posMent = _pickR(포지션멘트[pos] || [`${pos}의 흐름은`]);
-      const meaning = getCardMeaning(c, c.reversed);
-      lines.push(`${posMent} ${c.name}${c.reversed ? '(역방향)' : ''}으로 나타났습니다 — ${meaning}`);
+      const pos = SPREAD_LABELS[i];
+      lines.push(`[${pos}] ${c.name}${c.reversed ? ' (역방향)' : ''}\n${_r(포지션멘트[pos])} ${getCardMeaning(c, c.reversed)}`);
     });
     const pos = cards.some(c => !c.reversed && ['태양','별','세계','연인','전차'].includes(c.name));
     const neg = cards.some(c => c.reversed || ['탑','악마','달'].includes(c.name));
-    if (pos && !neg) lines.push('세 카드가 모두 긍정적인 흐름을 가리키고 있습니다. 자신감을 갖고 앞으로 나아가세요.');
-    else if (neg)    lines.push('도전의 기운이 보이지만, 이 과정은 당신을 더 단단하게 만드는 성장의 발판이 될 것입니다.');
-    else             lines.push('균형 잡힌 에너지 속에서 꾸준한 노력과 균형 감각이 좋은 결과를 가져올 것입니다.');
+    lines.push(pos && !neg
+      ? '세 장의 카드가 모두 긍정적인 흐름을 가리키고 있습니다. 자신감을 갖고 앞으로 나아가세요.'
+      : neg
+      ? '도전의 기운이 보이지만, 이 과정은 당신을 더 단단하게 만드는 성장의 발판이 될 것입니다.'
+      : '균형 잡힌 에너지 속에서 꾸준한 노력과 균형 감각이 좋은 결과를 가져올 것입니다.');
   }
-
   return lines.join('\n\n');
 }
-
-async function _runAI(generateFn, barEl, statusEl, outputEl, progressWrapEl, btnEl) {
-  btnEl.disabled = true;
-  statusEl.textContent = '분석 중...';
-  progressWrapEl.style.display = 'block';
-  outputEl.style.display = 'none';
-  barEl.style.width = '0%';
-
-  // 자연스러운 진행 애니메이션
-  await new Promise(resolve => {
-    let p = 0;
-    const iv = setInterval(() => {
-      p += 12 + Math.random() * 18;
-      barEl.style.width = Math.min(p, 92) + '%';
-      if (p >= 92) clearInterval(iv);
-    }, 120);
-    setTimeout(() => { clearInterval(iv); resolve(); }, 900);
-  });
-
-  barEl.style.width = '100%';
-  const text = generateFn();
-  outputEl.textContent = text;
-  outputEl.style.display = 'block';
-  statusEl.textContent = '✓ 완료';
-  progressWrapEl.style.display = 'none';
-  btnEl.disabled = false;
-}
-
-async function generateSajuAI() {
-  if (!현재사주) return;
-  const { 주오행, 일주 } = 현재사주;
-  await _runAI(
-    () => generateSajuText(주오행, 일주, 현재카테고리),
-    document.getElementById('ai-saju-bar'),
-    document.getElementById('ai-saju-status'),
-    document.getElementById('ai-saju-output'),
-    document.getElementById('ai-saju-progress-wrap'),
-    document.querySelector('#ai-saju-section .btn-ai'));
-}
-
-async function generateTarotAI() {
-  if (!drawnCards.length) return;
-  const cat = document.getElementById('tarot-cat').value;
-  await _runAI(
-    () => generateTarotText(drawnCards, cat),
-    document.getElementById('ai-tarot-bar'),
-    document.getElementById('ai-tarot-status'),
-    document.getElementById('ai-tarot-output'),
-    document.getElementById('ai-tarot-progress-wrap'),
-    document.querySelector('#ai-tarot-btn-row .btn-ai'));
-}
-
-function exportPDF() { window.print(); }
 
 // ════════════════════════════════════════════════
 //  초기화 (localStorage 복원)
@@ -1204,6 +958,5 @@ function exportPDF() { window.print(); }
   } catch(e) {}
 })();
 </script>
-
 </body>
 </html>
